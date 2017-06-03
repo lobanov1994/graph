@@ -411,7 +411,53 @@ class graph:
                 y1.append(self.xy[len(self.xy)-1-i])
                 w1.append(self.weights[i])
             return graph(n1, x1, y1, w1, 0)                  
-        
+    
+    def kruskulWithPassCompression(self, subGraph):
+        if self.__oriented == 0:
+            mk = []
+            for i in range(self.countOfNodes):
+                mk.append(-1)
+                
+            def find(i):
+                o = i
+                k = mk[o]
+                while k != -1:
+                    o = k
+                    k = mk[k]
+                o1 = i    
+                k = mk[o1]   
+                while k != -1:
+                    mk[o1] = o
+                    o1 = k
+                    k = mk[k]
+                return o
+            
+            def union(i,j):
+                mk[j]=i
+            
+            self.colouring()
+            self.sort()
+            choosenRibs = []
+            for i in range(self.countOfRibs):
+                x = self.xy[i]
+                y = self.xy[len(self.xy)-1-i]
+                h1 = find(x)
+                h2 = find(y)
+                print "Find(",x,") = ",find(x),"; Find(",y,") = ",find(y)
+                if h1 != h2:
+                    union(h1,h2)
+                    choosenRibs.append(i)
+                    
+            n1 = self.countOfNodes
+            x1 = []
+            y1 = []
+            w1 = []
+            for i in choosenRibs:
+                x1.append(self.xy[i])
+                y1.append(self.xy[len(self.xy)-1-i])
+                w1.append(self.weights[i])
+            return graph(n1, x1, y1, w1, 0)  
+    
     def BFS(self, s):
         if self.__oriented:
             self.r = []
@@ -531,6 +577,17 @@ def testKruskul():
     print gr1
     gr1.createPicture("graphs/graph4tree")
     
+def testKruskul2():
+    gr = openGraph("graphs/graph4.txt")
+    gr.makeNotOriented()
+    print gr
+    gr.sort()
+    print gr
+    gr.createPicture("graphs/graph4")
+    gr1 = gr.kruskulWithPassCompression(0)
+    print gr1
+    gr1.createPicture("graphs/graph4tree2")
+    
 def testBFS():
     gr = openGraph("graphs/graph5.txt")
     print gr
@@ -578,4 +635,4 @@ def testAddDelNotOriented2():
     gr.delete(3,0)
     print gr
     
-testAddDelNotOriented1()
+testKruskul2()
